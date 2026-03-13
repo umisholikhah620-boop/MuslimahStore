@@ -1,22 +1,8 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Trash2, Banknote, QrCode, CreditCard, CheckCircle2 } from 'lucide-react';
-
-const PRODUCTS = [
-    { id: 1, name: 'Abaya Rose Silk Premium', price: 450000, category: 'Dress & Abaya', image: '👗' },
-    { id: 2, name: 'Gamis Syari A-Line Jetblack', price: 320000, category: 'Dress & Abaya', image: '👘' },
-    { id: 3, name: 'Pashmina Inner 2in1 Silk', price: 85000, category: 'Hijab & Khimar', image: '🧕' },
-    { id: 4, name: 'French Khimar Premium XL', price: 125000, category: 'Hijab & Khimar', image: '🧕' },
-    { id: 5, name: 'Cadar Tali Sifon Arab', price: 35000, category: 'Aksesoris', image: '✨' },
-    { id: 6, name: 'Bros Dagu Rose Gold Kristal', price: 45000, category: 'Aksesoris', image: '🌸' },
-    { id: 7, name: 'Mukena Traveling Parasut', price: 175000, category: 'Perlengkapan Shalat', image: '🌙' },
-    { id: 8, name: 'Sajadah Muka Turki', price: 55000, category: 'Perlengkapan Shalat', image: '🕌' },
-    { id: 9, name: 'One Set Rayon Motif', price: 215000, category: 'Daily Wear', image: '🧥' },
-    { id: 10, name: 'Kaftan Silk Exclusive', price: 550000, category: 'Dress & Abaya', image: '👸' },
-    { id: 11, name: 'Bergo Maryam Diamond', price: 35000, category: 'Hijab & Khimar', image: '👒' },
-    { id: 12, name: 'Manset Tangan Rajut', price: 15000, category: 'Aksesoris', image: '🧤' },
-];
+import { supabase } from '../app/lib/supabase';
 
 const CATEGORIES = ['Semua', 'Dress & Abaya', 'Hijab & Khimar', 'Perlengkapan Shalat', 'Daily Wear', 'Aksesoris'];
 
@@ -29,8 +15,40 @@ export default function Dashboard({ onNavigate }) {
     const [cart, setCart] = useState([]);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState(null);
+    const [customerEmail, setCustomerEmail] = useState('');
+    const [isSendingEmail, setIsSendingEmail] = useState(false);
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const filteredProducts = activeCategory === 'Semua' ? PRODUCTS : PRODUCTS.filter(p => p.category === activeCategory);
+    useEffect(() => {
+        const fetchProducts = async () => {
+            if (!supabase) {
+                setLoading(false);
+                return;
+            }
+            try {
+                const { data, error } = await supabase.from('products').select('*');
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    setProducts(data);
+                } else {
+                    // Fallback jika database kosong
+                    setProducts([
+                        { id: 1, name: 'Abaya Rose Silk Premium', price: 450000, category: 'Dress & Abaya', image: '👗' },
+                        { id: 2, name: 'Gamis Syari A-Line Jetblack', price: 320000, category: 'Dress & Abaya', image: '👘' },
+                        { id: 3, name: 'Pashmina Inner 2in1 Silk', price: 85000, category: 'Hijab & Khimar', image: '🧕' },
+                    ]);
+                }
+            } catch (err) {
+                console.error("Error fetching products:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+
+    const filteredProducts = activeCategory === 'Semua' ? products : products.filter(p => p.category === activeCategory);
 
     const addToCart = (product) => {
         setCart(prev => {
@@ -65,10 +83,49 @@ export default function Dashboard({ onNavigate }) {
         setShowConfirmation(true);
     };
 
-    const finishTransaction = () => {
-        setShowConfirmation(false);
-        setPaymentMethod(null);
-        setCart([]);
+    const finishTransaction = async () => {
+        setIsSendingEmail(true);
+        try {
+            if (!supabase) {
+                // Skip DB saving if not connected
+                console.warn("Supabase not connected. Skipping transaction save.");
+            } else {
+                // Save to Supabase
+                const { error: dbError } = await supabase.from('transactions').insert([
+                    {
+                        total_amount: total,
+                        tax_amount: tax,
+                        payment_method: paymentMethod,
+                        customer_email: customerEmail || null,
+                        items: cart
+                    }
+                ]);
+
+                if (dbError) throw dbError;
+            }
+
+            if (customerEmail) {
+                // Simulasi pengiriman email
+                setTimeout(() => {
+                    alert(`Alhamdulillah, struk belanja telah dikirim ke: ${customerEmail}`);
+                    setIsSendingEmail(false);
+                    setShowConfirmation(false);
+                    setPaymentMethod(null);
+                    setCart([]);
+                    setCustomerEmail('');
+                }, 1000);
+            } else {
+                setIsSendingEmail(false);
+                setShowConfirmation(false);
+                setPaymentMethod(null);
+                setCart([]);
+            }
+        } catch (err) {
+            console.error("Error saving transaction:", err);
+            alert("Maaf, gagal menyimpan transaksi ke database. Tapi pesanan tetap kami proses secara lokal.");
+            setIsSendingEmail(false);
+            setShowConfirmation(false);
+        }
     };
 
     const handleLogout = () => {
@@ -101,14 +158,20 @@ export default function Dashboard({ onNavigate }) {
                 </div>
 
                 <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {filteredProducts.map(product => (
-                        <div key={product.id} onClick={() => addToCart(product)} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:border-[#B76E79]/50 hover:shadow-md transition-all cursor-pointer group">
-                            <div className="h-32 bg-[#f9f1f2] rounded-xl mb-4 flex items-center justify-center text-4xl group-hover:scale-105 transition-transform">{product.image}</div>
-                            <div className="text-xs text-[#B76E79] font-medium mb-1">{product.category}</div>
-                            <h3 className="font-semibold text-gray-800 text-sm mb-2 line-clamp-2 h-10">{product.name}</h3>
-                            <p className="font-bold text-gray-900">{formatRupiah(product.price)}</p>
-                        </div>
-                    ))}
+                    {loading ? (
+                        <div className="col-span-full text-center py-20 text-gray-400">Memuat katalog keberkahan...</div>
+                    ) : filteredProducts.length === 0 ? (
+                        <div className="col-span-full text-center py-20 text-gray-400">Stok sedang kosong, nantikan koleksi terbaru kami.</div>
+                    ) : (
+                        filteredProducts.map(product => (
+                            <div key={product.id} onClick={() => addToCart(product)} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:border-[#B76E79]/50 hover:shadow-md transition-all cursor-pointer group">
+                                <div className="h-32 bg-[#f9f1f2] rounded-xl mb-4 flex items-center justify-center text-4xl group-hover:scale-105 transition-transform">{product.image}</div>
+                                <div className="text-xs text-[#B76E79] font-medium mb-1">{product.category}</div>
+                                <h3 className="font-semibold text-gray-800 text-sm mb-2 line-clamp-2 h-10">{product.name}</h3>
+                                <p className="font-bold text-gray-900">{formatRupiah(product.price)}</p>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
 
@@ -174,27 +237,59 @@ export default function Dashboard({ onNavigate }) {
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">Pembayaran QRIS</h3>
                                 <p className="text-sm text-gray-500 mb-6">Silakan scan kode QR di bawah ini</p>
                                 
-                                <div className="bg-white p-4 border-4 border-[#B76E79]/20 rounded-2xl inline-block mb-6 relative">
-                                    {/* Simulasi QR Code menggunakan CSS & Lucide */}
-                                    <div className="w-48 h-48 bg-gray-50 flex items-center justify-center border-2 border-dashed border-gray-200">
-                                        <QrCode className="w-32 h-32 text-gray-800" />
-                                    </div>
-                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-2 rounded-lg shadow-md">
-                                        <Store className="w-8 h-8 text-[#B76E79]" />
-                                    </div>
+                                <div className="bg-white p-2 border-2 border-[#B76E79]/20 rounded-2xl inline-block mb-6 shadow-inner">
+                                    <img src="/qris.png" alt="QRIS Code" className="w-56 h-auto rounded-xl" />
                                 </div>
                                 
-                                <div className="text-2xl font-bold text-[#B76E79] mb-8">{formatRupiah(total)}</div>
+                                <div className="text-2xl font-bold text-[#B76E79] mb-4">{formatRupiah(total)}</div>
+
+                                <div className="mb-6 text-left">
+                                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Kirim Struk ke Email (Opsional)</label>
+                                    <input 
+                                        type="email" 
+                                        value={customerEmail}
+                                        onChange={(e) => setCustomerEmail(e.target.value)}
+                                        placeholder="ukhti@contoh.com"
+                                        className="w-full mt-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none transition-all text-sm"
+                                    />
+                                </div>
                                 
-                                <button onClick={finishTransaction} className="w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-bold py-4 rounded-xl transition-all shadow-lg">KONFIRMASI PEMBAYARAN BERHASIL</button>
+                                <button 
+                                    onClick={finishTransaction} 
+                                    className="w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"
+                                    disabled={isSendingEmail}
+                                >
+                                    {isSendingEmail ? (
+                                        <>Memproses...</>
+                                    ) : (
+                                        <>KONFIRMASI PEMBAYARAN BERHASIL</>
+                                    )}
+                                </button>
                             </div>
                         ) : (
                             <div className="animate-fadeIn">
                                 <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle2 className="w-10 h-10 text-green-500" /></div>
                                 <h3 className="text-2xl font-serif font-bold text-gray-900 mb-4">Alhamdulillah</h3>
                                 <p className="text-gray-600 text-lg leading-relaxed italic mb-8">"Jazaakillahu Khayran atas kunjungannya. Semoga pakaian ini membawa keberkahan dan kenyamanan dalam ketaatan."</p>
-                                <div className="text-sm font-semibold text-[#B76E79] mb-8">— Muslimah Store</div>
-                                <button onClick={finishTransaction} className="w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3 rounded-xl transition-colors">Tutup & Buat Pesanan Baru</button>
+                                
+                                <div className="mb-6 text-left">
+                                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Kirim Struk ke Email</label>
+                                    <input 
+                                        type="email" 
+                                        value={customerEmail}
+                                        onChange={(e) => setCustomerEmail(e.target.value)}
+                                        placeholder="ukhti@contoh.com"
+                                        className="w-full mt-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none transition-all text-sm"
+                                    />
+                                </div>
+
+                                <button 
+                                    onClick={finishTransaction} 
+                                    className="w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3 rounded-xl transition-colors disabled:opacity-50"
+                                    disabled={isSendingEmail}
+                                >
+                                    {isSendingEmail ? "Mengirim Struk..." : "Tutup & Buat Pesanan Baru"}
+                                </button>
                             </div>
                         )}
                         

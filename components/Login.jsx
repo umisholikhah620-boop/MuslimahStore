@@ -2,29 +2,54 @@
 
 import React, { useState } from 'react';
 import { User, Lock, Store } from 'lucide-react';
+import { supabase } from '../app/lib/supabase';
 
 export default function Login({ onNavigate }) {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
         
-        if (!username || !password) {
-            setError('Username dan password harus diisi.');
+        if (!email || !password) {
+            setError('Email dan password harus diisi.');
             return;
         }
 
-        if (username === 'admin' && password === 'admin123') {
+        setLoading(true);
+        try {
+            if (!supabase) {
+                throw new Error('Supabase belum dikonfigurasi. Gunakan login demo.');
+            }
+
+            const { data, error: authError } = await supabase.auth.signInWithPassword({
+                email: email.includes('@') ? email : `${email}@admin.com`, // Support username and email
+                password: password
+            });
+
+            if (authError) throw authError;
+
             if (onNavigate) {
                 onNavigate('dashboard');
             } else {
                 window.location.href = '/dashboard';
             }
-        } else {
-            setError('Username atau password salah. Coba: admin/admin123');
+        } catch (err) {
+            // Fallback for demo credentials if Supabase is not configured or fails
+            if (email === 'admin' && password === 'admin123') {
+                if (onNavigate) {
+                    onNavigate('dashboard');
+                } else {
+                    window.location.href = '/dashboard';
+                }
+                return;
+            }
+            setError(err.message || 'Login gagal. Cek email dan password Ukhti.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -63,8 +88,8 @@ export default function Login({ onNavigate }) {
                         </div>
                         <input
                             type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Username / Email Pegawai"
                             className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] focus:border-transparent outline-none transition-all"
                         />
@@ -86,15 +111,16 @@ export default function Login({ onNavigate }) {
                     <div className="flex flex-col gap-3">
                         <button
                             type="submit"
-                            className="w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3.5 rounded-xl transition-colors shadow-lg shadow-[#B76E79]/30"
+                            disabled={loading}
+                            className={`w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3.5 rounded-xl transition-colors shadow-lg shadow-[#B76E79]/30 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            MASUK KE DASHBOARD
+                            {loading ? 'Memproses...' : 'MASUK KE DASHBOARD'}
                         </button>
                         
                         <button
                             type="button"
                             onClick={() => {
-                                setUsername('admin');
+                                setEmail('admin');
                                 setPassword('admin123');
                             }}
                             className="w-full bg-[#f9f1f2] hover:bg-[#f2e2e4] text-[#B76E79] font-medium py-3 rounded-xl transition-colors border border-[#B76E79]/20"

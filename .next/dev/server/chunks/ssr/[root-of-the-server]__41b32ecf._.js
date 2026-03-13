@@ -344,6 +344,13 @@ function Register({ onNavigate }) {
     const [step, setStep] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(1);
     const [agreed1, setAgreed1] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [agreed2, setAgreed2] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [email, setEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [password, setPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [storeName, setStoreName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [ownerName, setOwnerName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [phone, setPhone] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const handleLoginClick = ()=>{
         if (onNavigate) {
             onNavigate('login');
@@ -351,11 +358,36 @@ function Register({ onNavigate }) {
             window.location.href = '/login';
         }
     };
-    const handleFinishRegister = ()=>{
-        if (onNavigate) {
-            onNavigate('login');
-        } else {
-            window.location.href = '/login';
+    const handleFinishRegister = async ()=>{
+        setError('');
+        if (!email || !password) {
+            setError('Email dan password wajib diisi.');
+            return;
+        }
+        setLoading(true);
+        try {
+            const { data, error: authError } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        store_name: storeName,
+                        owner_name: ownerName,
+                        phone: phone
+                    }
+                }
+            });
+            if (authError) throw authError;
+            alert('Alhamdulillah, pendaftaran berhasil! Silakan cek email Ukhti untuk verifikasi.');
+            if (onNavigate) {
+                onNavigate('login');
+            } else {
+                window.location.href = '/login';
+            }
+        } catch (err) {
+            setError(err.message || 'Maaf, pendaftaran gagal. Mohon coba lagi.');
+        } finally{
+            setLoading(false);
         }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -371,7 +403,7 @@ function Register({ onNavigate }) {
                             children: "Pendaftaran Mitra"
                         }, void 0, false, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 31,
+                            lineNumber: 66,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -379,13 +411,13 @@ function Register({ onNavigate }) {
                             children: "Bergabunglah dalam ekosistem niaga Islami"
                         }, void 0, false, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 32,
+                            lineNumber: 67,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Register.jsx",
-                    lineNumber: 30,
+                    lineNumber: 65,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -396,14 +428,14 @@ function Register({ onNavigate }) {
                             children: "1"
                         }, void 0, false, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 36,
+                            lineNumber: 71,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: `w-16 h-0.5 mx-2 ${step >= 2 ? 'bg-[#B76E79]' : 'bg-gray-200'}`
                         }, void 0, false, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 37,
+                            lineNumber: 72,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -411,20 +443,20 @@ function Register({ onNavigate }) {
                             children: "2"
                         }, void 0, false, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 38,
+                            lineNumber: 73,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Register.jsx",
-                    lineNumber: 35,
+                    lineNumber: 70,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("hr", {
                     className: "border-[#B76E79] opacity-20 mb-8"
                 }, void 0, false, {
                     fileName: "[project]/components/Register.jsx",
-                    lineNumber: 41,
+                    lineNumber: 76,
                     columnNumber: 17
                 }, this),
                 step === 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -437,14 +469,14 @@ function Register({ onNavigate }) {
                                     className: "w-5 h-5 text-[#B76E79]"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 46,
+                                    lineNumber: 81,
                                     columnNumber: 29
                                 }, this),
                                 " Tahap 1: Profil Toko"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 45,
+                            lineNumber: 80,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -454,7 +486,7 @@ function Register({ onNavigate }) {
                                     children: "Nama Toko"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 49,
+                                    lineNumber: 84,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -463,13 +495,13 @@ function Register({ onNavigate }) {
                                     className: "w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 50,
+                                    lineNumber: 85,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 48,
+                            lineNumber: 83,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -479,7 +511,7 @@ function Register({ onNavigate }) {
                                     children: "Nama Pemilik (Sesuai KTP)"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 53,
+                                    lineNumber: 88,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -488,13 +520,13 @@ function Register({ onNavigate }) {
                                     className: "w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 54,
+                                    lineNumber: 89,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 52,
+                            lineNumber: 87,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -504,7 +536,7 @@ function Register({ onNavigate }) {
                                     children: "Kontak (WhatsApp Aktif)"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 57,
+                                    lineNumber: 92,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -513,13 +545,13 @@ function Register({ onNavigate }) {
                                     className: "w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 58,
+                                    lineNumber: 93,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 56,
+                            lineNumber: 91,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -531,19 +563,19 @@ function Register({ onNavigate }) {
                                     className: "w-5 h-5"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 61,
+                                    lineNumber: 96,
                                     columnNumber: 41
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 60,
+                            lineNumber: 95,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Register.jsx",
-                    lineNumber: 44,
+                    lineNumber: 79,
                     columnNumber: 21
                 }, this),
                 step === 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -556,14 +588,14 @@ function Register({ onNavigate }) {
                                     className: "w-5 h-5 text-[#B76E79]"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 69,
+                                    lineNumber: 104,
                                     columnNumber: 29
                                 }, this),
                                 " Tahap 2: Komitmen Syariah"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 68,
+                            lineNumber: 103,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -579,7 +611,7 @@ function Register({ onNavigate }) {
                                             className: "mt-1 w-5 h-5 text-[#B76E79] rounded border-gray-300 focus:ring-[#B76E79]"
                                         }, void 0, false, {
                                             fileName: "[project]/components/Register.jsx",
-                                            lineNumber: 73,
+                                            lineNumber: 108,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -587,13 +619,13 @@ function Register({ onNavigate }) {
                                             children: "Saya berkomitmen hanya menjual pakaian yang menutup aurat (tidak transparan/ketat)."
                                         }, void 0, false, {
                                             fileName: "[project]/components/Register.jsx",
-                                            lineNumber: 74,
+                                            lineNumber: 109,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 72,
+                                    lineNumber: 107,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -606,7 +638,7 @@ function Register({ onNavigate }) {
                                             className: "mt-1 w-5 h-5 text-[#B76E79] rounded border-gray-300 focus:ring-[#B76E79]"
                                         }, void 0, false, {
                                             fileName: "[project]/components/Register.jsx",
-                                            lineNumber: 77,
+                                            lineNumber: 112,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -614,19 +646,19 @@ function Register({ onNavigate }) {
                                             children: "Saya berkomitmen menjalankan akad jual beli yang jujur tanpa riba."
                                         }, void 0, false, {
                                             fileName: "[project]/components/Register.jsx",
-                                            lineNumber: 78,
+                                            lineNumber: 113,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 76,
+                                    lineNumber: 111,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 71,
+                            lineNumber: 106,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -638,7 +670,7 @@ function Register({ onNavigate }) {
                                     children: "Kembali"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 82,
+                                    lineNumber: 117,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -648,19 +680,19 @@ function Register({ onNavigate }) {
                                     children: "DAFTARKAN MITRA"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Register.jsx",
-                                    lineNumber: 83,
+                                    lineNumber: 118,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Register.jsx",
-                            lineNumber: 81,
+                            lineNumber: 116,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Register.jsx",
-                    lineNumber: 67,
+                    lineNumber: 102,
                     columnNumber: 21
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -672,23 +704,23 @@ function Register({ onNavigate }) {
                         children: "Sudah punya akun? Masuk"
                     }, void 0, false, {
                         fileName: "[project]/components/Register.jsx",
-                        lineNumber: 89,
+                        lineNumber: 124,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/Register.jsx",
-                    lineNumber: 88,
+                    lineNumber: 123,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/Register.jsx",
-            lineNumber: 29,
+            lineNumber: 64,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/Register.jsx",
-        lineNumber: 28,
+        lineNumber: 63,
         columnNumber: 9
     }, this);
 }
@@ -818,6 +850,8 @@ function Dashboard({ onNavigate }) {
     const [cart, setCart] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [showConfirmation, setShowConfirmation] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [paymentMethod, setPaymentMethod] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [customerEmail, setCustomerEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [isSendingEmail, setIsSendingEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const filteredProducts = activeCategory === 'Semua' ? PRODUCTS : PRODUCTS.filter((p)=>p.category === activeCategory);
     const addToCart = (product)=>{
         setCart((prev)=>{
@@ -861,9 +895,22 @@ function Dashboard({ onNavigate }) {
         setShowConfirmation(true);
     };
     const finishTransaction = ()=>{
-        setShowConfirmation(false);
-        setPaymentMethod(null);
-        setCart([]);
+        if (customerEmail) {
+            setIsSendingEmail(true);
+            // Simulasi pengiriman email
+            setTimeout(()=>{
+                alert(`Alhamdulillah, struk belanja telah dikirim ke: ${customerEmail}`);
+                setIsSendingEmail(false);
+                setShowConfirmation(false);
+                setPaymentMethod(null);
+                setCart([]);
+                setCustomerEmail('');
+            }, 1000);
+        } else {
+            setShowConfirmation(false);
+            setPaymentMethod(null);
+            setCart([]);
+        }
     };
     const handleLogout = ()=>{
         if (onNavigate) {
@@ -891,7 +938,7 @@ function Dashboard({ onNavigate }) {
                                         children: "Muslimah Store POS"
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 91,
+                                        lineNumber: 106,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -899,13 +946,13 @@ function Dashboard({ onNavigate }) {
                                         children: "Bismillah, melayani dengan hati."
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 92,
+                                        lineNumber: 107,
                                         columnNumber: 25
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 90,
+                                lineNumber: 105,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -914,13 +961,13 @@ function Dashboard({ onNavigate }) {
                                 children: "Keluar"
                             }, void 0, false, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 94,
+                                lineNumber: 109,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/Dashboard.jsx",
-                        lineNumber: 89,
+                        lineNumber: 104,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -931,12 +978,12 @@ function Dashboard({ onNavigate }) {
                                 children: cat
                             }, cat, false, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 99,
+                                lineNumber: 114,
                                 columnNumber: 25
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.jsx",
-                        lineNumber: 97,
+                        lineNumber: 112,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -950,7 +997,7 @@ function Dashboard({ onNavigate }) {
                                         children: product.image
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 106,
+                                        lineNumber: 121,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -958,7 +1005,7 @@ function Dashboard({ onNavigate }) {
                                         children: product.category
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 107,
+                                        lineNumber: 122,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -966,7 +1013,7 @@ function Dashboard({ onNavigate }) {
                                         children: product.name
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 108,
+                                        lineNumber: 123,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -974,24 +1021,24 @@ function Dashboard({ onNavigate }) {
                                         children: formatRupiah(product.price)
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 109,
+                                        lineNumber: 124,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, product.id, true, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 105,
+                                lineNumber: 120,
                                 columnNumber: 25
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.jsx",
-                        lineNumber: 103,
+                        lineNumber: 118,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/Dashboard.jsx",
-                lineNumber: 88,
+                lineNumber: 103,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1007,14 +1054,14 @@ function Dashboard({ onNavigate }) {
                                         className: "w-5 h-5 text-[#B76E79]"
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 117,
+                                        lineNumber: 132,
                                         columnNumber: 93
                                     }, this),
                                     "Pesanan Saat Ini"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 117,
+                                lineNumber: 132,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1026,19 +1073,19 @@ function Dashboard({ onNavigate }) {
                                         children: "A-01"
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 118,
+                                        lineNumber: 133,
                                         columnNumber: 83
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 118,
+                                lineNumber: 133,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/Dashboard.jsx",
-                        lineNumber: 116,
+                        lineNumber: 131,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1050,20 +1097,20 @@ function Dashboard({ onNavigate }) {
                                     className: "w-12 h-12 mb-3 opacity-20"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 124,
+                                    lineNumber: 139,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                     children: "Keranjang masih kosong"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 125,
+                                    lineNumber: 140,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Dashboard.jsx",
-                            lineNumber: 123,
+                            lineNumber: 138,
                             columnNumber: 25
                         }, this) : cart.map((item)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "flex justify-between items-center gap-3 pb-4 border-b border-gray-50",
@@ -1076,7 +1123,7 @@ function Dashboard({ onNavigate }) {
                                                 children: item.name
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 131,
+                                                lineNumber: 146,
                                                 columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1084,13 +1131,13 @@ function Dashboard({ onNavigate }) {
                                                 children: formatRupiah(item.price)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 132,
+                                                lineNumber: 147,
                                                 columnNumber: 37
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 130,
+                                        lineNumber: 145,
                                         columnNumber: 33
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1105,7 +1152,7 @@ function Dashboard({ onNavigate }) {
                                                         children: "-"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/Dashboard.jsx",
-                                                        lineNumber: 136,
+                                                        lineNumber: 151,
                                                         columnNumber: 41
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1113,7 +1160,7 @@ function Dashboard({ onNavigate }) {
                                                         children: item.qty
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/Dashboard.jsx",
-                                                        lineNumber: 137,
+                                                        lineNumber: 152,
                                                         columnNumber: 41
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1122,13 +1169,13 @@ function Dashboard({ onNavigate }) {
                                                         children: "+"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/Dashboard.jsx",
-                                                        lineNumber: 138,
+                                                        lineNumber: 153,
                                                         columnNumber: 41
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 135,
+                                                lineNumber: 150,
                                                 columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1138,29 +1185,29 @@ function Dashboard({ onNavigate }) {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/Dashboard.jsx",
-                                                    lineNumber: 141,
+                                                    lineNumber: 156,
                                                     columnNumber: 41
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 140,
+                                                lineNumber: 155,
                                                 columnNumber: 37
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 134,
+                                        lineNumber: 149,
                                         columnNumber: 33
                                     }, this)
                                 ]
                             }, item.id, true, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 129,
+                                lineNumber: 144,
                                 columnNumber: 29
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.jsx",
-                        lineNumber: 121,
+                        lineNumber: 136,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1176,7 +1223,7 @@ function Dashboard({ onNavigate }) {
                                                 children: "Subtotal"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 151,
+                                                lineNumber: 166,
                                                 columnNumber: 85
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1184,13 +1231,13 @@ function Dashboard({ onNavigate }) {
                                                 children: formatRupiah(subtotal)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 151,
+                                                lineNumber: 166,
                                                 columnNumber: 106
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 151,
+                                        lineNumber: 166,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1200,7 +1247,7 @@ function Dashboard({ onNavigate }) {
                                                 children: "Infaq / Pajak (10%)"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 152,
+                                                lineNumber: 167,
                                                 columnNumber: 85
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1208,13 +1255,13 @@ function Dashboard({ onNavigate }) {
                                                 children: formatRupiah(tax)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 152,
+                                                lineNumber: 167,
                                                 columnNumber: 117
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 152,
+                                        lineNumber: 167,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1224,7 +1271,7 @@ function Dashboard({ onNavigate }) {
                                                 children: "Total Akhir"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 153,
+                                                lineNumber: 168,
                                                 columnNumber: 125
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1232,19 +1279,19 @@ function Dashboard({ onNavigate }) {
                                                 children: formatRupiah(total)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 153,
+                                                lineNumber: 168,
                                                 columnNumber: 149
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 153,
+                                        lineNumber: 168,
                                         columnNumber: 25
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 150,
+                                lineNumber: 165,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1258,14 +1305,14 @@ function Dashboard({ onNavigate }) {
                                                 className: "w-5 h-5 text-[#B76E79]"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 157,
+                                                lineNumber: 172,
                                                 columnNumber: 264
                                             }, this),
                                             "TUNAI"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 157,
+                                        lineNumber: 172,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1276,14 +1323,14 @@ function Dashboard({ onNavigate }) {
                                                 className: "w-5 h-5 text-[#B76E79]"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 158,
+                                                lineNumber: 173,
                                                 columnNumber: 269
                                             }, this),
                                             "BAYAR QRIS"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 158,
+                                        lineNumber: 173,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1294,20 +1341,20 @@ function Dashboard({ onNavigate }) {
                                                 className: "w-5 h-5 text-[#B76E79]"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 159,
+                                                lineNumber: 174,
                                                 columnNumber: 264
                                             }, this),
                                             "DEBIT"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 159,
+                                        lineNumber: 174,
                                         columnNumber: 25
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 156,
+                                lineNumber: 171,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1317,19 +1364,19 @@ function Dashboard({ onNavigate }) {
                                 children: cart.length === 0 ? 'KERANJANG KOSONG' : 'BAYAR SEKARANG'
                             }, void 0, false, {
                                 fileName: "[project]/components/Dashboard.jsx",
-                                lineNumber: 162,
+                                lineNumber: 177,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/Dashboard.jsx",
-                        lineNumber: 149,
+                        lineNumber: 164,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/Dashboard.jsx",
-                lineNumber: 115,
+                lineNumber: 130,
                 columnNumber: 13
             }, this),
             showConfirmation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1345,7 +1392,7 @@ function Dashboard({ onNavigate }) {
                                     children: "Pembayaran QRIS"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 174,
+                                    lineNumber: 189,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1353,67 +1400,79 @@ function Dashboard({ onNavigate }) {
                                     children: "Silakan scan kode QR di bawah ini"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 175,
+                                    lineNumber: 190,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "bg-white p-4 border-4 border-[#B76E79]/20 rounded-2xl inline-block mb-6 relative",
+                                    className: "bg-white p-2 border-2 border-[#B76E79]/20 rounded-2xl inline-block mb-6 shadow-inner",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                        src: "/qris.png",
+                                        alt: "QRIS Code",
+                                        className: "w-56 h-auto rounded-xl"
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/Dashboard.jsx",
+                                        lineNumber: 193,
+                                        columnNumber: 37
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/components/Dashboard.jsx",
+                                    lineNumber: 192,
+                                    columnNumber: 33
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "text-2xl font-bold text-[#B76E79] mb-4",
+                                    children: formatRupiah(total)
+                                }, void 0, false, {
+                                    fileName: "[project]/components/Dashboard.jsx",
+                                    lineNumber: 196,
+                                    columnNumber: 33
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "mb-6 text-left",
                                     children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "w-48 h-48 bg-gray-50 flex items-center justify-center border-2 border-dashed border-gray-200",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$qr$2d$code$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__QrCode$3e$__["QrCode"], {
-                                                className: "w-32 h-32 text-gray-800"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 180,
-                                                columnNumber: 41
-                                            }, this)
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                            className: "text-xs font-semibold text-gray-500 uppercase ml-1",
+                                            children: "Kirim Struk ke Email (Opsional)"
                                         }, void 0, false, {
                                             fileName: "[project]/components/Dashboard.jsx",
-                                            lineNumber: 179,
+                                            lineNumber: 199,
                                             columnNumber: 37
                                         }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-2 rounded-lg shadow-md",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(Store, {
-                                                className: "w-8 h-8 text-[#B76E79]"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/Dashboard.jsx",
-                                                lineNumber: 183,
-                                                columnNumber: 41
-                                            }, this)
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            type: "email",
+                                            value: customerEmail,
+                                            onChange: (e)=>setCustomerEmail(e.target.value),
+                                            placeholder: "ukhti@contoh.com",
+                                            className: "w-full mt-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none transition-all text-sm"
                                         }, void 0, false, {
                                             fileName: "[project]/components/Dashboard.jsx",
-                                            lineNumber: 182,
+                                            lineNumber: 200,
                                             columnNumber: 37
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 177,
-                                    columnNumber: 33
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-2xl font-bold text-[#B76E79] mb-8",
-                                    children: formatRupiah(total)
-                                }, void 0, false, {
-                                    fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 187,
+                                    lineNumber: 198,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     onClick: finishTransaction,
-                                    className: "w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-bold py-4 rounded-xl transition-all shadow-lg",
-                                    children: "KONFIRMASI PEMBAYARAN BERHASIL"
+                                    className: "w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2",
+                                    disabled: isSendingEmail,
+                                    children: isSendingEmail ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                        children: "Memproses..."
+                                    }, void 0, false) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                        children: "KONFIRMASI PEMBAYARAN BERHASIL"
+                                    }, void 0, false)
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 189,
+                                    lineNumber: 209,
                                     columnNumber: 33
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Dashboard.jsx",
-                            lineNumber: 173,
+                            lineNumber: 188,
                             columnNumber: 29
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "animate-fadeIn",
@@ -1424,12 +1483,12 @@ function Dashboard({ onNavigate }) {
                                         className: "w-10 h-10 text-green-500"
                                     }, void 0, false, {
                                         fileName: "[project]/components/Dashboard.jsx",
-                                        lineNumber: 193,
+                                        lineNumber: 223,
                                         columnNumber: 131
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 193,
+                                    lineNumber: 223,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -1437,7 +1496,7 @@ function Dashboard({ onNavigate }) {
                                     children: "Alhamdulillah"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 194,
+                                    lineNumber: 224,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1445,30 +1504,51 @@ function Dashboard({ onNavigate }) {
                                     children: '"Jazaakillahu Khayran atas kunjungannya. Semoga pakaian ini membawa keberkahan dan kenyamanan dalam ketaatan."'
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 195,
+                                    lineNumber: 225,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-sm font-semibold text-[#B76E79] mb-8",
-                                    children: "— Muslimah Store"
-                                }, void 0, false, {
+                                    className: "mb-6 text-left",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                            className: "text-xs font-semibold text-gray-500 uppercase ml-1",
+                                            children: "Kirim Struk ke Email"
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/Dashboard.jsx",
+                                            lineNumber: 228,
+                                            columnNumber: 37
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            type: "email",
+                                            value: customerEmail,
+                                            onChange: (e)=>setCustomerEmail(e.target.value),
+                                            placeholder: "ukhti@contoh.com",
+                                            className: "w-full mt-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none transition-all text-sm"
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/Dashboard.jsx",
+                                            lineNumber: 229,
+                                            columnNumber: 37
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 196,
+                                    lineNumber: 227,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     onClick: finishTransaction,
-                                    className: "w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3 rounded-xl transition-colors",
-                                    children: "Tutup & Buat Pesanan Baru"
+                                    className: "w-full bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3 rounded-xl transition-colors disabled:opacity-50",
+                                    disabled: isSendingEmail,
+                                    children: isSendingEmail ? "Mengirim Struk..." : "Tutup & Buat Pesanan Baru"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.jsx",
-                                    lineNumber: 197,
+                                    lineNumber: 238,
                                     columnNumber: 33
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Dashboard.jsx",
-                            lineNumber: 192,
+                            lineNumber: 222,
                             columnNumber: 29
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1477,24 +1557,24 @@ function Dashboard({ onNavigate }) {
                             children: "✕"
                         }, void 0, false, {
                             fileName: "[project]/components/Dashboard.jsx",
-                            lineNumber: 201,
+                            lineNumber: 248,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Dashboard.jsx",
-                    lineNumber: 170,
+                    lineNumber: 185,
                     columnNumber: 21
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/Dashboard.jsx",
-                lineNumber: 169,
+                lineNumber: 184,
                 columnNumber: 17
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/Dashboard.jsx",
-        lineNumber: 87,
+        lineNumber: 102,
         columnNumber: 9
     }, this);
 }

@@ -1,12 +1,20 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Store, ShieldCheck, ChevronRight } from 'lucide-react';
+import { Store, ShieldCheck, ChevronRight, Mail, Lock } from 'lucide-react';
+import { supabase } from '../app/lib/supabase';
 
 export default function Register({ onNavigate }) {
     const [step, setStep] = useState(1);
     const [agreed1, setAgreed1] = useState(false);
     const [agreed2, setAgreed2] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [storeName, setStoreName] = useState('');
+    const [ownerName, setOwnerName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleLoginClick = () => {
         if (onNavigate) {
@@ -16,11 +24,43 @@ export default function Register({ onNavigate }) {
         }
     };
 
-    const handleFinishRegister = () => {
-        if (onNavigate) {
-            onNavigate('login');
-        } else {
-            window.location.href = '/login';
+    const handleFinishRegister = async () => {
+        setError('');
+        if (!email || !password) {
+            setError('Email dan password wajib diisi.');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            if (!supabase) {
+                throw new Error('Supabase belum dikonfigurasi. Silakan hubungi pengelola.');
+            }
+
+            const { data, error: authError } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        store_name: storeName,
+                        owner_name: ownerName,
+                        phone: phone
+                    }
+                }
+            });
+
+            if (authError) throw authError;
+
+            alert('Alhamdulillah, pendaftaran berhasil! Silakan cek email Ukhti untuk verifikasi.');
+            if (onNavigate) {
+                onNavigate('login');
+            } else {
+                window.location.href = '/login';
+            }
+        } catch (err) {
+            setError(err.message || 'Maaf, pendaftaran gagal. Mohon coba lagi.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -45,20 +85,35 @@ export default function Register({ onNavigate }) {
                         <h3 className="font-medium text-gray-800 flex items-center gap-2 mb-4">
                             <Store className="w-5 h-5 text-[#B76E79]" /> Tahap 1: Profil Toko
                         </h3>
+                        {error && (
+                            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-100 text-center">
+                                {error}
+                            </div>
+                        )}
                         <div>
                             <label className="block text-sm text-gray-600 mb-1">Nama Toko</label>
-                            <input type="text" placeholder="Contoh: Muslimah Store Cabang Solo" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
+                            <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} placeholder="Contoh: Muslimah Store Cabang Solo" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
                         </div>
                         <div>
                             <label className="block text-sm text-gray-600 mb-1">Nama Pemilik (Sesuai KTP)</label>
-                            <input type="text" placeholder="Nama Lengkap" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
+                            <input type="text" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} placeholder="Nama Lengkap" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
                         </div>
                         <div>
                             <label className="block text-sm text-gray-600 mb-1">Kontak (WhatsApp Aktif)</label>
-                            <input type="tel" placeholder="08xxxxxxxxxx" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
+                            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="08xxxxxxxxxx" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
                         </div>
-                        <button onClick={() => setStep(2)} className="w-full mt-6 bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3.5 rounded-xl transition-colors flex justify-center items-center gap-2">
-                            Selanjutnya <ChevronRight className="w-5 h-5" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                            <div>
+                                <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><Mail className="w-3 h-3" /> Email Akun</label>
+                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ukhti@contoh.com" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><Lock className="w-3 h-3" /> Password</label>
+                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="******" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
+                            </div>
+                        </div>
+                        <button onClick={() => setStep(2)} className="w-full mt-6 bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3.5 rounded-xl transition-colors flex justify-center items-center gap-2" disabled={loading}>
+                            {loading ? 'Memproses...' : <>Selanjutnya <ChevronRight className="w-5 h-5" /></>}
                         </button>
                     </div>
                 )}
@@ -80,7 +135,9 @@ export default function Register({ onNavigate }) {
                         </div>
                         <div className="flex gap-3 mt-8">
                             <button onClick={() => setStep(1)} className="w-1/3 border border-[#B76E79] text-[#B76E79] hover:bg-[#f9f1f2] font-medium py-3.5 rounded-xl transition-colors">Kembali</button>
-                            <button disabled={!agreed1 || !agreed2} onClick={handleFinishRegister} className={`w-2/3 font-medium py-3.5 rounded-xl transition-colors ${agreed1 && agreed2 ? 'bg-[#B76E79] hover:bg-[#a05d67] text-white shadow-lg shadow-[#B76E79]/30' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>DAFTARKAN MITRA</button>
+                            <button disabled={!agreed1 || !agreed2 || loading} onClick={handleFinishRegister} className={`w-2/3 font-medium py-3.5 rounded-xl transition-colors ${agreed1 && agreed2 && !loading ? 'bg-[#B76E79] hover:bg-[#a05d67] text-white shadow-lg shadow-[#B76E79]/30' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
+                                {loading ? 'Mendaftarkan...' : 'DAFTARKAN MITRA'}
+                            </button>
                         </div>
                     </div>
                 )}
