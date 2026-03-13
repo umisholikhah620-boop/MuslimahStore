@@ -325,23 +325,6 @@ function Login({ onNavigate }) {
                         fileName: "[project]/components/Login.jsx",
                         lineNumber: 133,
                         columnNumber: 17
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mt-6 text-center",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                            type: "button",
-                            onClick: handleRegisterClick,
-                            className: "text-sm text-[#B76E79] hover:underline",
-                            children: "Belum punya akun? Daftar Mitra"
-                        }, void 0, false, {
-                            fileName: "[project]/components/Login.jsx",
-                            lineNumber: 142,
-                            columnNumber: 21
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/components/Login.jsx",
-                        lineNumber: 141,
-                        columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
@@ -355,12 +338,12 @@ function Login({ onNavigate }) {
                     children: "Mencari Rezeki yang Halal & Thayyib adalah Ibadah."
                 }, void 0, false, {
                     fileName: "[project]/components/Login.jsx",
-                    lineNumber: 149,
+                    lineNumber: 145,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/Login.jsx",
-                lineNumber: 148,
+                lineNumber: 144,
                 columnNumber: 13
             }, this)
         ]

@@ -138,11 +138,7 @@ export default function Login({ onNavigate }) {
                     </div>
                 </div>
 
-                <div className="mt-6 text-center">
-                    <button type="button" onClick={handleRegisterClick} className="text-sm text-[#B76E79] hover:underline">
-                        Belum punya akun? Daftar Mitra
-                    </button>
-                </div>
+
             </div>
 
             <div className="mt-12 text-center text-gray-500 text-sm">
