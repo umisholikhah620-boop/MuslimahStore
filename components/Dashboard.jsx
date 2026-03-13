@@ -10,6 +10,21 @@ const formatRupiah = (number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
 };
 
+const FALLBACK_PRODUCTS = [
+    { id: 1, name: 'Abaya Rose Silk Premium', price: 450000, category: 'Dress & Abaya', image: '👗' },
+    { id: 2, name: 'Gamis Syari A-Line Jetblack', price: 320000, category: 'Dress & Abaya', image: '👘' },
+    { id: 3, name: 'Pashmina Inner 2in1 Silk', price: 85000, category: 'Hijab & Khimar', image: '🧕' },
+    { id: 4, name: 'French Khimar Premium XL', price: 125000, category: 'Hijab & Khimar', image: '🧕' },
+    { id: 5, name: 'Cadar Tali Sifon Arab', price: 35000, category: 'Aksesoris', image: '✨' },
+    { id: 6, name: 'Bros Dagu Rose Gold Kristal', price: 45000, category: 'Aksesoris', image: '🌸' },
+    { id: 7, name: 'Mukena Traveling Parasut', price: 175000, category: 'Perlengkapan Shalat', image: '🌙' },
+    { id: 8, name: 'Sajadah Muka Turki', price: 55000, category: 'Perlengkapan Shalat', image: '🕌' },
+    { id: 9, name: 'One Set Rayon Motif', price: 215000, category: 'Daily Wear', image: '🧥' },
+    { id: 10, name: 'Kaftan Silk Exclusive', price: 550000, category: 'Dress & Abaya', image: '👸' },
+    { id: 11, name: 'Bergo Maryam Diamond', price: 35000, category: 'Hijab & Khimar', image: '👒' },
+    { id: 12, name: 'Manset Tangan Rajut', price: 15000, category: 'Aksesoris', image: '🧤' },
+];
+
 export default function Dashboard({ onNavigate }) {
     const [activeCategory, setActiveCategory] = useState('Semua');
     const [cart, setCart] = useState([]);
@@ -17,38 +32,47 @@ export default function Dashboard({ onNavigate }) {
     const [paymentMethod, setPaymentMethod] = useState(null);
     const [customerEmail, setCustomerEmail] = useState('');
     const [isSendingEmail, setIsSendingEmail] = useState(false);
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [products, setProducts] = useState(FALLBACK_PRODUCTS);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
+        console.log("Dashboard: useEffect started");
         const fetchProducts = async () => {
+            console.log("Dashboard: fetchProducts running, supabase status:", !!supabase);
+            
             if (!supabase) {
+                console.log("Dashboard: No Supabase, using fallback");
+                setProducts(FALLBACK_PRODUCTS);
                 setLoading(false);
                 return;
             }
             try {
-                const { data, error } = await supabase.from('products').select('*');
-                if (error) throw error;
+                const { data, error: dbError } = await supabase.from('products').select('*');
+                console.log("Dashboard: Supabase response:", { count: data?.length, error: dbError });
+                
+                if (dbError) throw dbError;
                 if (data && data.length > 0) {
                     setProducts(data);
                 } else {
-                    // Fallback jika database kosong
-                    setProducts([
-                        { id: 1, name: 'Abaya Rose Silk Premium', price: 450000, category: 'Dress & Abaya', image: '👗' },
-                        { id: 2, name: 'Gamis Syari A-Line Jetblack', price: 320000, category: 'Dress & Abaya', image: '👘' },
-                        { id: 3, name: 'Pashmina Inner 2in1 Silk', price: 85000, category: 'Hijab & Khimar', image: '🧕' },
-                    ]);
+                    console.log("Dashboard: DB empty, using fallback");
+                    setProducts(FALLBACK_PRODUCTS);
                 }
             } catch (err) {
-                console.error("Error fetching products:", err);
+                console.error("Dashboard: Fetch error:", err);
+                setError(err.message);
+                setProducts(FALLBACK_PRODUCTS);
             } finally {
+                console.log("Dashboard: fetchProducts finished");
                 setLoading(false);
             }
         };
         fetchProducts();
     }, []);
 
+    console.log("Dashboard: Rendering with state:", { productsCount: products.length, loading, category: activeCategory });
     const filteredProducts = activeCategory === 'Semua' ? products : products.filter(p => p.category === activeCategory);
+    console.log("Dashboard: Filtered products count:", filteredProducts.length);
 
     const addToCart = (product) => {
         setCart(prev => {
@@ -148,7 +172,10 @@ export default function Dashboard({ onNavigate }) {
                         <h1 className="text-2xl font-serif text-[#B76E79] font-bold">Muslimah Store POS</h1>
                         <p className="text-sm text-gray-500">Bismillah, melayani dengan hati.</p>
                     </div>
-                    <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-[#B76E79] border border-gray-200 px-4 py-2 rounded-lg bg-white">Keluar</button>
+                    <div className="flex items-center gap-4">
+                        <div className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Debug: L={loading ? 'Y' : 'N'} P={products.length}</div>
+                        <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-[#B76E79] border border-gray-200 px-4 py-2 rounded-lg bg-white">Keluar</button>
+                    </div>
                 </div>
 
                 <div className="flex gap-3 mb-8 overflow-x-auto pb-2 scrollbar-hide">
@@ -156,6 +183,14 @@ export default function Dashboard({ onNavigate }) {
                         <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-5 py-2.5 rounded-full whitespace-nowrap font-medium transition-all ${activeCategory === cat ? 'bg-[#B76E79] text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:border-[#B76E79]'}`}>{cat}</button>
                     ))}
                 </div>
+
+                {error && (
+                    <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm flex flex-col gap-1">
+                        <p className="font-bold">⚠️ Kendala Koneksi Supabase:</p>
+                        <p>{error}</p>
+                        <p className="text-xs opacity-70 italic">Sistem beralih ke katalog cadangan sementara.</p>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {loading ? (

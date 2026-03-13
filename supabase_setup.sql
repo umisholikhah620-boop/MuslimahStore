@@ -1,5 +1,5 @@
 -- Tabel Produk
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   name TEXT NOT NULL,
   price NUMERIC NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE products (
 );
 
 -- Tabel Transaksi
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   total_amount NUMERIC NOT NULL,
   tax_amount NUMERIC NOT NULL,
