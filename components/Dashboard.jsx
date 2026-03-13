@@ -129,15 +129,38 @@ export default function Dashboard({ onNavigate }) {
             }
 
             if (customerEmail) {
-                // Simulasi pengiriman email
-                setTimeout(() => {
+                // Send email via API
+                try {
+                    const response = await fetch('/api/send-receipt', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: customerEmail,
+                            items: cart,
+                            total,
+                            tax,
+                            subtotal,
+                            paymentMethod
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Gagal mengirim email.');
+                    }
+
                     alert(`Alhamdulillah, struk belanja telah dikirim ke: ${customerEmail}`);
+                } catch (emailErr) {
+                    console.error("Error sending email:", emailErr);
+                    alert("Maaf, terjadi kesalahan saat mengirim email struk. Transaksi tetap sukses.");
+                } finally {
                     setIsSendingEmail(false);
                     setShowConfirmation(false);
                     setPaymentMethod(null);
                     setCart([]);
                     setCustomerEmail('');
-                }, 1000);
+                }
             } else {
                 setIsSendingEmail(false);
                 setShowConfirmation(false);

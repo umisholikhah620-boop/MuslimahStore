@@ -264,6 +264,10 @@ img, video {
   pointer-events: none;
 }
 
+.collapse {
+  visibility: collapse;
+}
+
 .fixed {
   position: fixed;
 }
@@ -405,8 +409,16 @@ img, video {
   display: flex;
 }
 
+.table {
+  display: table;
+}
+
 .grid {
   display: grid;
+}
+
+.hidden {
+  display: none;
 }
 
 .h-0\.5 {
@@ -519,6 +531,10 @@ img, video {
 
 .flex-1 {
   flex: 1;
+}
+
+.border-collapse {
+  border-collapse: collapse;
 }
 
 @keyframes pulse {
