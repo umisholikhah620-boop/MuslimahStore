@@ -16,7 +16,7 @@ export default function Login({ onNavigate }) {
         setError('');
         
         if (!email || !password) {
-            setError('Email dan password harus diisi.');
+            setError(loginRole === 'customer' ? 'Username dan password harus diisi.' : 'Email dan password harus diisi.');
             return;
         }
 
@@ -26,8 +26,28 @@ export default function Login({ onNavigate }) {
                 throw new Error('Supabase belum dikonfigurasi. Gunakan login demo.');
             }
 
+            let finalEmail = email;
+
+            // Jika role adalah customer dan input tidak mengandung @ (berarti dia memasukkan Username)
+            if (loginRole === 'customer' && !email.includes('@')) {
+                // Cari email asli dari tabel profiles berdasarkan username
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('email')
+                    .eq('username', email.toLowerCase())
+                    .single();
+
+                if (profileError || !profile) {
+                    throw new Error('Username tidak ditemukan di sistem kami.');
+                }
+                
+                finalEmail = profile.email;
+            } else if (loginRole === 'admin' && !email.includes('@') && email !== 'admin') {
+                finalEmail = `${email}@admin.com`;
+            }
+
             const { data, error: authError } = await supabase.auth.signInWithPassword({
-                email: email.includes('@') ? email : `${email}@admin.com`, // Support username and email
+                email: finalEmail,
                 password: password
             });
 
@@ -49,7 +69,7 @@ export default function Login({ onNavigate }) {
                 else window.location.href = '/customer';
                 return;
             }
-            setError(err.message || 'Login gagal. Cek email dan password Ukhti.');
+            setError(err.message || 'Login gagal. Silakan periksa kembali ketikan Anda.');
         } finally {
             setLoading(false);
         }
@@ -109,7 +129,7 @@ export default function Login({ onNavigate }) {
                             type="text"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder={loginRole === 'admin' ? "Username / Email Pegawai" : "Username / Email"}
+                            placeholder={loginRole === 'admin' ? "Email / Username Pegawai" : "Username (tanpa spasi) atau Email"}
                             className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] focus:border-transparent outline-none transition-all"
                         />
                     </div>

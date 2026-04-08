@@ -33,3 +33,15 @@ INSERT INTO products (name, price, category, image) VALUES
 ('Kaftan Silk Exclusive', 550000, 'Dress & Abaya', '👸'),
 ('Bergo Maryam Diamond', 35000, 'Hijab & Khimar', '👒'),
 ('Manset Tangan Rajut', 15000, 'Aksesoris', '🧤');
+
+-- Tabel Profiles (Buku Telepon Username -> Email)
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  full_name TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Buka gembok RLS agar aplikasi bisa mencari/menyimpan profil baru
+ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;

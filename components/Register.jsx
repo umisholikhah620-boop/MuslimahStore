@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Store, ChevronRight, Mail, Lock, User, Phone } from 'lucide-react';
+import { Store, ChevronRight, Mail, Lock, User, Phone, AtSign } from 'lucide-react';
 import { supabase } from '../app/lib/supabase';
 
 export default function Register({ onNavigate }) {
     const [fullName, setFullName] = useState('');
+    const [username, setUsername] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -24,8 +25,14 @@ export default function Register({ onNavigate }) {
         e.preventDefault();
         setError('');
         
-        if (!fullName || !phone || !email || !password) {
+        if (!fullName || !username || !phone || !email || !password) {
             setError('Semua kolom wajib diisi ya, Ukhti.');
+            return;
+        }
+
+        // Validate username (no spaces allowed)
+        if (username.includes(' ')) {
+            setError('Username tidak boleh menggunakan spasi.');
             return;
         }
 
@@ -35,28 +42,47 @@ export default function Register({ onNavigate }) {
                 throw new Error('Supabase belum dikonfigurasi. Silakan hubungi admin toko.');
             }
 
+            // 1. Sign up to Supabase Auth
             const { data, error: authError } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
                     data: {
                         full_name: fullName,
+                        username: username,
                         phone: phone,
-                        role: 'customer' // Memberi identitas bahwa ini akun pelanggan
+                        role: 'customer'
                     }
                 }
             });
 
             if (authError) throw authError;
 
-            alert('Alhamdulillah, akun berhasil dibuat! Silakan pilih "Customer" di layar login.');
+            // 2. Insert mapped profile so user can login with username later
+            if (data?.user?.id) {
+                const { error: profileError } = await supabase.from('profiles').insert([
+                    {
+                        id: data.user.id,
+                        username: username.toLowerCase(),
+                        email: email,
+                        full_name: fullName
+                    }
+                ]);
+
+                if (profileError) {
+                    console.error("Profile creation error:", profileError);
+                    // We don't block the user, but we warn developer
+                }
+            }
+
+            alert('Alhamdulillah, akun berhasil dibuat! Silakan masuk (Login) menggunakan Username yang baru saja dibuat.');
             if (onNavigate) {
                 onNavigate('login');
             } else {
                 window.location.href = '/login';
             }
         } catch (err) {
-            setError(err.message || 'Maaf, pendaftaran gagal. Mohon pastikan email belum terdaftar sebelumnya.');
+            setError(err.message || 'Maaf, pendaftaran gagal. Mohon pastikan email/username belum terdaftar sebelumnya.');
         } finally {
             setLoading(false);
         }
@@ -83,6 +109,11 @@ export default function Register({ onNavigate }) {
                     <div>
                         <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><User className="w-4 h-4" /> Nama Lengkap</label>
                         <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Misal: Aisyah Fatimah" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] focus:outline-none transition-all" />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><AtSign className="w-4 h-4" /> Username (Tanpa Spasi)</label>
+                        <input type="text" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} placeholder="Misal: aisyah123" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] focus:outline-none transition-all" />
                     </div>
                     
                     <div>
