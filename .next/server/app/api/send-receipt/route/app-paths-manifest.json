@@ -1,0 +1,3 @@
+{
+  "/api/send-receipt/route": "app/api/send-receipt/route.js"
+}

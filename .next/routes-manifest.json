@@ -41,6 +41,18 @@
       "namedRegex": "^/_not\\-found(?:/)?$"
     },
     {
+      "page": "/api/send-receipt",
+      "regex": "^/api/send\\-receipt(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/send\\-receipt(?:/)?$"
+    },
+    {
+      "page": "/customer",
+      "regex": "^/customer(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/customer(?:/)?$"
+    },
+    {
       "page": "/dashboard",
       "regex": "^/dashboard(?:/)?$",
       "routeKeys": {},
