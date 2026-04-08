@@ -1,18 +1,14 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Store, ShieldCheck, ChevronRight, Mail, Lock } from 'lucide-react';
+import { Store, ChevronRight, Mail, Lock, User, Phone } from 'lucide-react';
 import { supabase } from '../app/lib/supabase';
 
 export default function Register({ onNavigate }) {
-    const [step, setStep] = useState(1);
-    const [agreed1, setAgreed1] = useState(false);
-    const [agreed2, setAgreed2] = useState(false);
+    const [fullName, setFullName] = useState('');
+    const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [storeName, setStoreName] = useState('');
-    const [ownerName, setOwnerName] = useState('');
-    const [phone, setPhone] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -24,17 +20,19 @@ export default function Register({ onNavigate }) {
         }
     };
 
-    const handleFinishRegister = async () => {
+    const handleRegister = async (e) => {
+        e.preventDefault();
         setError('');
-        if (!email || !password) {
-            setError('Email dan password wajib diisi.');
+        
+        if (!fullName || !phone || !email || !password) {
+            setError('Semua kolom wajib diisi ya, Ukhti.');
             return;
         }
 
         setLoading(true);
         try {
             if (!supabase) {
-                throw new Error('Supabase belum dikonfigurasi. Silakan hubungi pengelola.');
+                throw new Error('Supabase belum dikonfigurasi. Silakan hubungi admin toko.');
             }
 
             const { data, error: authError } = await supabase.auth.signUp({
@@ -42,23 +40,23 @@ export default function Register({ onNavigate }) {
                 password,
                 options: {
                     data: {
-                        store_name: storeName,
-                        owner_name: ownerName,
-                        phone: phone
+                        full_name: fullName,
+                        phone: phone,
+                        role: 'customer' // Memberi identitas bahwa ini akun pelanggan
                     }
                 }
             });
 
             if (authError) throw authError;
 
-            alert('Alhamdulillah, pendaftaran berhasil! Silakan cek email Ukhti untuk verifikasi.');
+            alert('Alhamdulillah, akun berhasil dibuat! Silakan pilih "Customer" di layar login.');
             if (onNavigate) {
                 onNavigate('login');
             } else {
                 window.location.href = '/login';
             }
         } catch (err) {
-            setError(err.message || 'Maaf, pendaftaran gagal. Mohon coba lagi.');
+            setError(err.message || 'Maaf, pendaftaran gagal. Mohon pastikan email belum terdaftar sebelumnya.');
         } finally {
             setLoading(false);
         }
@@ -66,84 +64,55 @@ export default function Register({ onNavigate }) {
 
     return (
         <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 font-sans">
-            <div className="w-full max-w-lg bg-white p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100">
+            <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100">
                 <div className="text-center mb-8">
-                    <h2 className="text-2xl font-serif text-[#B76E79] font-semibold">Pendaftaran Mitra</h2>
-                    <p className="text-gray-500 text-sm mt-1">Bergabunglah dalam ekosistem niaga Islami</p>
+                    <div className="w-16 h-16 bg-[#f9f1f2] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <User className="w-8 h-8 text-[#B76E79]" />
+                    </div>
+                    <h2 className="text-2xl font-serif text-[#B76E79] font-semibold">Pendaftaran Pelanggan</h2>
+                    <p className="text-gray-500 text-sm mt-1 italic">Silakan buat akun untuk mulai berbelanja</p>
                 </div>
 
-                <div className="flex items-center justify-center mb-8">
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${step >= 1 ? 'bg-[#B76E79] text-white' : 'bg-gray-200 text-gray-500'}`}>1</div>
-                    <div className={`w-16 h-0.5 mx-2 ${step >= 2 ? 'bg-[#B76E79]' : 'bg-gray-200'}`}></div>
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${step >= 2 ? 'bg-[#B76E79] text-white' : 'bg-gray-200 text-gray-500'}`}>2</div>
-                </div>
-
-                <hr className="border-[#B76E79] opacity-20 mb-8" />
-
-                {step === 1 && (
-                    <div className="space-y-4 animate-fadeIn">
-                        <h3 className="font-medium text-gray-800 flex items-center gap-2 mb-4">
-                            <Store className="w-5 h-5 text-[#B76E79]" /> Tahap 1: Profil Toko
-                        </h3>
-                        {error && (
-                            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-100 text-center">
-                                {error}
-                            </div>
-                        )}
-                        <div>
-                            <label className="block text-sm text-gray-600 mb-1">Nama Toko</label>
-                            <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} placeholder="Contoh: Muslimah Store Cabang Solo" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
+                <form onSubmit={handleRegister} className="space-y-4 animate-fadeIn">
+                    {error && (
+                        <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-100 text-center animate-fadeIn">
+                            {error}
                         </div>
-                        <div>
-                            <label className="block text-sm text-gray-600 mb-1">Nama Pemilik (Sesuai KTP)</label>
-                            <input type="text" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} placeholder="Nama Lengkap" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
-                        </div>
-                        <div>
-                            <label className="block text-sm text-gray-600 mb-1">Kontak (WhatsApp Aktif)</label>
-                            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="08xxxxxxxxxx" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                            <div>
-                                <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><Mail className="w-3 h-3" /> Email Akun</label>
-                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ukhti@contoh.com" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><Lock className="w-3 h-3" /> Password</label>
-                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="******" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] outline-none" />
-                            </div>
-                        </div>
-                        <button onClick={() => setStep(2)} className="w-full mt-6 bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3.5 rounded-xl transition-colors flex justify-center items-center gap-2" disabled={loading}>
-                            {loading ? 'Memproses...' : <>Selanjutnya <ChevronRight className="w-5 h-5" /></>}
-                        </button>
+                    )}
+                    
+                    <div>
+                        <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><User className="w-4 h-4" /> Nama Lengkap</label>
+                        <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Misal: Aisyah Fatimah" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] focus:outline-none transition-all" />
                     </div>
-                )}
-
-                {step === 2 && (
-                    <div className="space-y-6 animate-fadeIn">
-                        <h3 className="font-medium text-gray-800 flex items-center gap-2 mb-4">
-                            <ShieldCheck className="w-5 h-5 text-[#B76E79]" /> Tahap 2: Komitmen Syariah
-                        </h3>
-                        <div className="space-y-4">
-                            <label className="flex items-start gap-3 cursor-pointer p-3 border border-gray-100 rounded-xl hover:bg-[#f9f1f2]/50 transition-colors">
-                                <input type="checkbox" checked={agreed1} onChange={(e) => setAgreed1(e.target.checked)} className="mt-1 w-5 h-5 text-[#B76E79] rounded border-gray-300 focus:ring-[#B76E79]" />
-                                <span className="text-gray-700 text-sm leading-relaxed">Saya berkomitmen hanya menjual pakaian yang menutup aurat (tidak transparan/ketat).</span>
-                            </label>
-                            <label className="flex items-start gap-3 cursor-pointer p-3 border border-gray-100 rounded-xl hover:bg-[#f9f1f2]/50 transition-colors">
-                                <input type="checkbox" checked={agreed2} onChange={(e) => setAgreed2(e.target.checked)} className="mt-1 w-5 h-5 text-[#B76E79] rounded border-gray-300 focus:ring-[#B76E79]" />
-                                <span className="text-gray-700 text-sm leading-relaxed">Saya berkomitmen menjalankan akad jual beli yang jujur tanpa riba.</span>
-                            </label>
-                        </div>
-                        <div className="flex gap-3 mt-8">
-                            <button onClick={() => setStep(1)} className="w-1/3 border border-[#B76E79] text-[#B76E79] hover:bg-[#f9f1f2] font-medium py-3.5 rounded-xl transition-colors">Kembali</button>
-                            <button disabled={!agreed1 || !agreed2 || loading} onClick={handleFinishRegister} className={`w-2/3 font-medium py-3.5 rounded-xl transition-colors ${agreed1 && agreed2 && !loading ? 'bg-[#B76E79] hover:bg-[#a05d67] text-white shadow-lg shadow-[#B76E79]/30' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
-                                {loading ? 'Mendaftarkan...' : 'DAFTARKAN MITRA'}
-                            </button>
-                        </div>
+                    
+                    <div>
+                        <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><Phone className="w-4 h-4" /> No. WhatsApp</label>
+                        <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="08xxxxxxxxxx" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] focus:outline-none transition-all" />
                     </div>
-                )}
+                    
+                    <div>
+                        <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><Mail className="w-4 h-4" /> Email Aktif</label>
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ukhti@contoh.com" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] focus:outline-none transition-all" />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1"><Lock className="w-4 h-4" /> Password Minimal 6 Karakter</label>
+                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="******" className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B76E79] focus:outline-none transition-all" />
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        disabled={loading}
+                        className={`w-full mt-6 bg-[#B76E79] hover:bg-[#a05d67] text-white font-medium py-3.5 rounded-xl transition-all shadow-lg flex justify-center items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : 'shadow-[#B76E79]/30'}`}
+                    >
+                        {loading ? 'Menyimpan Data...' : 'DAFTAR SEKARANG'}
+                    </button>
+                </form>
 
                 <div className="mt-6 text-center">
-                    <button type="button" onClick={handleLoginClick} className="text-sm text-gray-500 hover:text-[#B76E79]">Sudah punya akun? Masuk</button>
+                    <button type="button" onClick={handleLoginClick} className="text-sm text-gray-500 hover:text-[#B76E79] font-medium transition-colors">
+                        Sudah punya akun? Masuk (Login)
+                    </button>
                 </div>
             </div>
         </div>
