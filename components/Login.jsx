@@ -135,6 +135,16 @@ export default function Login({ onNavigate }) {
                         >
                             {loading ? 'Memproses...' : (loginRole === 'admin' ? 'MASUK KE DASHBOARD ADMIN' : 'MASUK KE TOKO')}
                         </button>
+                        
+                        {loginRole === 'customer' && (
+                            <button 
+                                type="button" 
+                                onClick={handleRegisterClick} 
+                                className="text-sm text-gray-500 hover:text-[#B76E79] mt-2 transition-colors font-medium"
+                            >
+                                Pelanggan Baru? Daftar Akun di sini
+                            </button>
+                        )}
                     </div>
                 </form>
 
