@@ -39,7 +39,7 @@ export default function Login({ onNavigate }) {
             }
         } catch (err) {
             // Fallback for demo credentials if Supabase is not configured or fails
-            if (email === 'admin' && password === 'admin123') {
+            if (email === 'admin' && password === '123') {
                 if (onNavigate) {
                     onNavigate('dashboard');
                 } else {
