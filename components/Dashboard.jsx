@@ -138,7 +138,12 @@ export default function Dashboard({ onNavigate }) {
                     }
                 ]);
 
-                if (dbError) throw dbError;
+                if (dbError) {
+                    console.error("Supabase Error:", dbError);
+                    alert("Gagal menaruh Laporan! Mohon pastikan tabel `transactions` di Supabase Anda sudah dimatikan kunci RLS (Row Level Security)-nya.");
+                    setIsSendingEmail(false);
+                    return;
+                }
             }
 
             if (customerEmail) {
@@ -160,13 +165,13 @@ export default function Dashboard({ onNavigate }) {
                     });
 
                     if (!response.ok) {
-                        throw new Error('Gagal mengirim email.');
+                        alert("Transaksi TERSIMPAN di Laporan Keuangan, namun gagal mengirim email instruksinya! Pastikan EMAIL_USER di .env.local Anda valid.");
+                    } else {
+                        alert(`Alhamdulillah, struk belanja telah dikirim ke: ${customerEmail}`);
                     }
-
-                    alert(`Alhamdulillah, struk belanja telah dikirim ke: ${customerEmail}`);
                 } catch (emailErr) {
                     console.error("Error sending email:", emailErr);
-                    alert("Maaf, terjadi kesalahan saat mengirim email struk. Transaksi tetap sukses.");
+                    alert("Transaksi TRANSAKSI MASUK Laporan Keuangan, namun jaringan SMTP Email tertolak.");
                 } finally {
                     setIsSendingEmail(false);
                     setShowConfirmation(false);
@@ -175,6 +180,7 @@ export default function Dashboard({ onNavigate }) {
                     setCustomerEmail('');
                 }
             } else {
+                alert("Transaksi berhasil masuk Laporan tanpa dikirim ke email!");
                 setIsSendingEmail(false);
                 setShowConfirmation(false);
                 setPaymentMethod(null);
@@ -182,7 +188,7 @@ export default function Dashboard({ onNavigate }) {
             }
         } catch (err) {
             console.error("Error saving transaction:", err);
-            alert("Maaf, gagal menyimpan transaksi ke database. Tapi pesanan tetap kami proses secara lokal.");
+            alert("Maaf, gagal mengeksekusi keranjang ini.");
             setIsSendingEmail(false);
             setShowConfirmation(false);
         }

@@ -104,7 +104,7 @@ export default function CustomerDashboard({ onNavigate }) {
         try {
             // Save to database
             if (supabase) {
-                await supabase.from('transactions').insert([
+                const { error: dbError } = await supabase.from('transactions').insert([
                     {
                         total_amount: total,
                         tax_amount: tax,
@@ -113,12 +113,17 @@ export default function CustomerDashboard({ onNavigate }) {
                         items: cart
                     }
                 ]);
+                if (dbError) {
+                    console.error("Supabase error:", dbError);
+                    alert("Database menolak menyimpan laporan! Mohon pastikan tabel transactions bebas dari kunci RLS (Row Level Security) di panel Supabase Admin Anda.");
+                    setIsProcessing(false);
+                    return;
+                }
             }
 
             // Send receipt via API
             try {
-                // If it's the demo email, it probably won't be sent physically, but API will accept.
-                await fetch('/api/send-receipt', {
+                const response = await fetch('/api/send-receipt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -128,14 +133,23 @@ export default function CustomerDashboard({ onNavigate }) {
                         paymentMethod: method
                     }),
                 });
-            } catch (ignore) {}
 
-            alert(`Alhamdulillah, pembayaran ${method} berhasil! Struk dikirim ke ${customerEmail}`);
+                if (!response.ok) {
+                    console.error("API send-receipt menyala merah.");
+                    alert("Transaksi BERHASIL TERCATAT, namun gagal mengirimkan email ke pembeli! Mohon periksa apakah Anda sudah memasukkan EMAIL_USER dan EMAIL_PASS di dalam file .env.local Anda.");
+                } else {
+                    alert(`Alhamdulillah, pembayaran ${method} berhasil! Struk dikirim ke ${customerEmail}`);
+                }
+            } catch (errApi) {
+                console.error("Error memanggil API Send-receipt:", errApi);
+                alert("Transaksi BERHASIL TERCATAT, namun API Email gagal dijangkau. Mohon pastikan kredensial SMTP Email tersedia.");
+            }
+
             setCart([]);
             setShowPayment(false);
         } catch (err) {
             console.error("Error transacting:", err);
-            alert("Maaf, ada kendala jaringan, namun pesanan Anda sedang kami proses.");
+            alert("Maaf, ada kendala jaringan internal.");
         } finally {
             setIsProcessing(false);
             setPaymentMethod(null);
