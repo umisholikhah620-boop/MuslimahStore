@@ -12,16 +12,16 @@ const formatRupiah = (number) => {
 
 const FALLBACK_PRODUCTS = [
     { id: 1, name: 'Abaya Rose Silk Premium', price: 450000, category: 'Dress & Abaya', image: '👗' },
-    { id: 2, name: 'Gamis Syari A-Line Jetblack', price: 320000, category: 'Dress & Abaya', image: '👘' },
+    { id: 2, name: 'Gamis Syari A-Line Jetblack', price: 320000, category: 'Dress & Abaya', image: '🥻' },
     { id: 3, name: 'Pashmina Inner 2in1 Silk', price: 85000, category: 'Hijab & Khimar', image: '🧕' },
     { id: 4, name: 'French Khimar Premium XL', price: 125000, category: 'Hijab & Khimar', image: '🧕' },
-    { id: 5, name: 'Cadar Tali Sifon Arab', price: 35000, category: 'Aksesoris', image: '✨' },
-    { id: 6, name: 'Bros Dagu Rose Gold Kristal', price: 45000, category: 'Aksesoris', image: '🌸' },
-    { id: 7, name: 'Mukena Traveling Parasut', price: 175000, category: 'Perlengkapan Shalat', image: '🌙' },
+    { id: 5, name: 'Cadar Tali Sifon Arab', price: 35000, category: 'Aksesoris', image: '🧕' },
+    { id: 6, name: 'Bros Dagu Rose Gold Kristal', price: 45000, category: 'Aksesoris', image: '💎' },
+    { id: 7, name: 'Mukena Traveling Parasut', price: 175000, category: 'Perlengkapan Shalat', image: '🕋' },
     { id: 8, name: 'Sajadah Muka Turki', price: 55000, category: 'Perlengkapan Shalat', image: '🕌' },
-    { id: 9, name: 'One Set Rayon Motif', price: 215000, category: 'Daily Wear', image: '🧥' },
-    { id: 10, name: 'Kaftan Silk Exclusive', price: 550000, category: 'Dress & Abaya', image: '👸' },
-    { id: 11, name: 'Bergo Maryam Diamond', price: 35000, category: 'Hijab & Khimar', image: '👒' },
+    { id: 9, name: 'One Set Rayon Motif', price: 215000, category: 'Daily Wear', image: '👚' },
+    { id: 10, name: 'Kaftan Silk Exclusive', price: 550000, category: 'Dress & Abaya', image: '👘' },
+    { id: 11, name: 'Bergo Maryam Diamond', price: 35000, category: 'Hijab & Khimar', image: '🧕' },
     { id: 12, name: 'Manset Tangan Rajut', price: 15000, category: 'Aksesoris', image: '🧤' },
 ];
 
@@ -249,8 +249,10 @@ export default function Dashboard({ onNavigate }) {
                         <div className="col-span-full text-center py-20 text-gray-400">Stok sedang kosong, nantikan koleksi terbaru kami.</div>
                     ) : (
                         filteredProducts.map(product => (
-                            <div key={product.id} onClick={() => addToCart(product)} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:border-[#B76E79]/50 hover:shadow-md transition-all cursor-pointer group">
-                                <div className="h-32 bg-[#f9f1f2] rounded-xl mb-4 flex items-center justify-center text-4xl group-hover:scale-105 transition-transform">{product.image}</div>
+                            <div key={product.id} onClick={() => addToCart(product)} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:shadow-md hover:border-[#B76E79]/30 transition-all group flex flex-col h-full bg-blend-overlay">
+                                <div className="h-32 bg-[#f9f1f2] rounded-xl mb-4 flex items-center justify-center text-4xl group-hover:scale-105 transition-transform overflow-hidden">
+                                    {(product.image && (product.image.includes('http') || product.image.includes('/'))) ? <img src={product.image} alt={product.name} className="w-full h-full object-cover" /> : (product.image || '👗')}
+                                </div>
                                 <div className="text-xs text-[#B76E79] font-medium mb-1">{product.category}</div>
                                 <h3 className="font-semibold text-gray-800 text-sm mb-2 line-clamp-2 h-10">{product.name}</h3>
                                 <p className="font-bold text-gray-900">{formatRupiah(product.price)}</p>

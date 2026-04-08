@@ -10,16 +10,16 @@ const formatRupiah = (number) => {
 
 const FALLBACK_PRODUCTS = [
     { id: 1, name: 'Abaya Rose Silk Premium', price: 450000, category: 'Dress & Abaya', image: '👗' },
-    { id: 2, name: 'Gamis Syari A-Line Jetblack', price: 320000, category: 'Dress & Abaya', image: '👘' },
+    { id: 2, name: 'Gamis Syari A-Line Jetblack', price: 320000, category: 'Dress & Abaya', image: '🥻' },
     { id: 3, name: 'Pashmina Inner 2in1 Silk', price: 85000, category: 'Hijab & Khimar', image: '🧕' },
     { id: 4, name: 'French Khimar Premium XL', price: 125000, category: 'Hijab & Khimar', image: '🧕' },
-    { id: 5, name: 'Cadar Tali Sifon Arab', price: 35000, category: 'Aksesoris', image: '✨' },
-    { id: 6, name: 'Bros Dagu Rose Gold Kristal', price: 45000, category: 'Aksesoris', image: '🌸' },
-    { id: 7, name: 'Mukena Traveling Parasut', price: 175000, category: 'Perlengkapan Shalat', image: '🌙' },
+    { id: 5, name: 'Cadar Tali Sifon Arab', price: 35000, category: 'Aksesoris', image: '🧕' },
+    { id: 6, name: 'Bros Dagu Rose Gold Kristal', price: 45000, category: 'Aksesoris', image: '💎' },
+    { id: 7, name: 'Mukena Traveling Parasut', price: 175000, category: 'Perlengkapan Shalat', image: '🕋' },
     { id: 8, name: 'Sajadah Muka Turki', price: 55000, category: 'Perlengkapan Shalat', image: '🕌' },
-    { id: 9, name: 'One Set Rayon Motif', price: 215000, category: 'Daily Wear', image: '🧥' },
-    { id: 10, name: 'Kaftan Silk Exclusive', price: 550000, category: 'Dress & Abaya', image: '👸' },
-    { id: 11, name: 'Bergo Maryam Diamond', price: 35000, category: 'Hijab & Khimar', image: '👒' },
+    { id: 9, name: 'One Set Rayon Motif', price: 215000, category: 'Daily Wear', image: '👚' },
+    { id: 10, name: 'Kaftan Silk Exclusive', price: 550000, category: 'Dress & Abaya', image: '👘' },
+    { id: 11, name: 'Bergo Maryam Diamond', price: 35000, category: 'Hijab & Khimar', image: '🧕' },
     { id: 12, name: 'Manset Tangan Rajut', price: 15000, category: 'Aksesoris', image: '🧤' },
 ];
 
@@ -169,8 +169,8 @@ export default function CustomerDashboard({ onNavigate }) {
                     <div className="grid grid-cols-2 gap-4">
                         {products.map(prod => (
                             <div key={prod.id} className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col group">
-                                <div className="h-36 bg-gray-50 rounded-xl mb-3 flex items-center justify-center text-5xl">
-                                    {prod.image || '👗'}
+                                <div className="h-36 bg-gray-50 rounded-xl mb-3 flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                                    {(prod.image && (prod.image.includes('http') || prod.image.includes('/'))) ? <img src={prod.image} alt={prod.name} className="w-full h-full object-cover" /> : (prod.image || '👗')}
                                 </div>
                                 <h4 className="text-xs font-semibold text-gray-800 mb-1 leading-tight line-clamp-2">{prod.name}</h4>
                                 <p className="text-[#B76E79] font-bold text-sm mt-auto pt-1">{formatRupiah(prod.price)}</p>
