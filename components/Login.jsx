@@ -116,27 +116,8 @@ export default function Login({ onNavigate }) {
                         >
                             {loading ? 'Memproses...' : 'MASUK KE DASHBOARD'}
                         </button>
-                        
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setEmail('admin');
-                                setPassword('admin123');
-                            }}
-                            className="w-full bg-[#f9f1f2] hover:bg-[#f2e2e4] text-[#B76E79] font-medium py-3 rounded-xl transition-colors border border-[#B76E79]/20"
-                        >
-                            ISI KREDENSIAL DEMO
-                        </button>
                     </div>
                 </form>
-
-                <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-center">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">Akses Demo (Uji Coba)</p>
-                    <div className="flex justify-center gap-4 text-sm text-gray-600">
-                        <span>User: <strong className="text-gray-900">admin</strong></span>
-                        <span>Pass: <strong className="text-gray-900">admin123</strong></span>
-                    </div>
-                </div>
 
 
             </div>
