@@ -35,6 +35,8 @@ export default function Dashboard({ onNavigate }) {
     const [products, setProducts] = useState(FALLBACK_PRODUCTS);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [adminTab, setAdminTab] = useState('kasir'); // 'kasir' | 'laporan'
+    const [transactions, setTransactions] = useState([]);
 
     useEffect(() => {
         console.log("Dashboard: useEffect started");
@@ -68,6 +70,17 @@ export default function Dashboard({ onNavigate }) {
             }
         };
         fetchProducts();
+
+        const fetchTransactions = async () => {
+            if (!supabase) return;
+            try {
+                const { data, error } = await supabase.from('transactions').select('*').order('created_at', { ascending: false });
+                if (!error && data) {
+                    setTransactions(data);
+                }
+            } catch(e) { console.error(e); }
+        };
+        fetchTransactions();
     }, []);
 
     console.log("Dashboard: Rendering with state:", { productsCount: products.length, loading, category: activeCategory });
@@ -188,16 +201,30 @@ export default function Dashboard({ onNavigate }) {
     const total = subtotal + tax;
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row font-sans">
-            <div className="flex-1 p-6 overflow-y-auto h-screen">
+        <div className="min-h-screen font-sans flex flex-col bg-gray-50">
+            {/* Admin Top Nav */}
+            <div className="bg-white px-6 py-4 border-b border-gray-200 flex justify-between items-center shadow-sm z-20 sticky top-0">
+                <div className="flex items-center gap-3">
+                    <h1 className="text-xl font-serif text-[#B76E79] font-bold">Muslimah Store</h1>
+                    <span className="bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded">Admin</span>
+                </div>
+                <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+                    <button onClick={() => setAdminTab('kasir')} className={`px-5 py-2.5 text-sm font-semibold rounded-lg transition-all ${adminTab === 'kasir' ? 'bg-white shadow-sm text-[#B76E79]' : 'text-gray-400 hover:text-gray-600'}`}>Kasir POS</button>
+                    <button onClick={() => setAdminTab('laporan')} className={`px-5 py-2.5 text-sm font-semibold rounded-lg transition-all ${adminTab === 'laporan' ? 'bg-white shadow-sm text-[#B76E79]' : 'text-gray-400 hover:text-gray-600'}`}>Laporan Keuangan</button>
+                </div>
+                <button onClick={handleLogout} className="text-sm font-bold text-gray-400 hover:text-red-500 transition-colors">Keluar 🚪</button>
+            </div>
+
+            {adminTab === 'kasir' ? (
+                <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                    <div className="flex-1 p-6 overflow-y-auto h-[calc(100vh-80px)]">
                 <div className="flex justify-between items-center mb-8">
                     <div>
-                        <h1 className="text-2xl font-serif text-[#B76E79] font-bold">Muslimah Store POS</h1>
+                        <h1 className="text-2xl font-serif text-[#B76E79] font-bold">Kasir Penjualan</h1>
                         <p className="text-sm text-gray-500">Bismillah, melayani dengan hati.</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Debug: L={loading ? 'Y' : 'N'} P={products.length}</div>
-                        <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-[#B76E79] border border-gray-200 px-4 py-2 rounded-lg bg-white">Keluar</button>
                     </div>
                 </div>
 
@@ -352,6 +379,52 @@ export default function Dashboard({ onNavigate }) {
                         )}
                         
                         <button onClick={() => setShowConfirmation(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕</button>
+                    </div>
+                </div>
+            )}
+                </div>
+            ) : (
+                <div className="flex-1 p-8 overflow-y-auto bg-gray-50">
+                    <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-800">Laporan Keuangan & Riwayat</h2>
+                                <p className="text-sm text-gray-500">Seluruh catatan transaksi pembeli & kasir.</p>
+                            </div>
+                            <div className="bg-[#f9f1f2] px-4 py-2 rounded-xl border border-[#B76E79]/20">
+                                <span className="text-xs text-[#B76E79] font-bold uppercase">Total Pendapatan</span>
+                                <div className="text-xl font-bold text-gray-900">{formatRupiah(transactions.reduce((acc, t) => acc + (t.total_amount || 0), 0))}</div>
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50 text-gray-500 text-sm border-b border-gray-200">
+                                        <th className="py-3 px-4 font-semibold">TANGGAL</th>
+                                        <th className="py-3 px-4 font-semibold">EMAIL PEMBELI</th>
+                                        <th className="py-3 px-4 font-semibold">METODE</th>
+                                        <th className="py-3 px-4 font-semibold text-right">TOTAL (Rp)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {transactions.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="4" className="text-center py-10 text-gray-400">Belum ada transaksi tercatat.</td>
+                                        </tr>
+                                    ) : (
+                                        transactions.map((t) => (
+                                            <tr key={t.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                                <td className="py-3 px-4 text-sm text-gray-800">{new Date(t.created_at).toLocaleString('id-ID')}</td>
+                                                <td className="py-3 px-4 text-sm text-gray-600 font-medium">{t.customer_email || 'Pembeli Offline'}</td>
+                                                <td className="py-3 px-4 text-xs"><span className={`px-2 py-1 rounded-md font-bold ${t.payment_method === 'QRIS' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>{t.payment_method}</span></td>
+                                                <td className="py-3 px-4 text-sm font-bold text-right text-gray-900">{formatRupiah(t.total_amount || 0)}</td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             )}
